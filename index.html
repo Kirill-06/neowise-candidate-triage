@@ -19,7 +19,7 @@
   <h1>Входящие заявки</h1>
   <form>
     <label for="message">Текст заявки</label>
-    <textarea id="message" rows="4" required></textarea>
+    <textarea id="message" rows="4"></textarea>
     <button type="submit">Разобрать заявку</button>
   </form>
 
@@ -75,13 +75,19 @@
       event.preventDefault();
       // старый черновик убираем сразу, чтобы его не отправили по ошибке к новой заявке
       clearDraft();
+      const text = message.value.trim();
+      if (!text) {
+        showNotice("Введите текст заявки.", "error");
+        return;
+      }
+
       showNotice("Разбираем заявку…");
       button.disabled = true;
       try {
         const reply = await fetch("/api/triage", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text: message.value }),
+          body: JSON.stringify({ text }),
         });
         render(reply.status, await reply.json());
       } catch {
